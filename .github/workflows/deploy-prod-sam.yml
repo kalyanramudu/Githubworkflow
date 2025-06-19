@@ -13,7 +13,7 @@ permissions:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: ${{ github.ref_name }}
+    environment: ${{ github.ref_name }}  # Ensure environments are named 'Development' and 'Production'
 
     steps:
       - name: Checkout code
@@ -62,7 +62,7 @@ jobs:
       - name: Configure AWS Credentials using OIDC
         uses: aws-actions/configure-aws-credentials@v3
         with:
-          role-to-assume: ${{ secrets[format('{0}_ROLE_ARN', github.ref_name | upper)] }}
+          role-to-assume: arn:aws:iam::571600831534:role/github-actions-sam-deploy-role
           aws-region: ${{ env.AWS_DEFAULT_REGION }}
 
       - name: SAM Build
