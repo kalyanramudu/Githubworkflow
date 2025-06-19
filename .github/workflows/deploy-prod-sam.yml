@@ -19,7 +19,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Load environment variables from branch file
+      - name: Load environment variables from branch
         run: |
           BRANCH="${GITHUB_REF#refs/heads/}"
           FILE=".github/envs/${BRANCH}.env"
@@ -36,7 +36,7 @@ jobs:
           done < "$FILE"
         shell: bash
 
-      - name: Inject secrets based on branch
+      - name: Inject secrets into env
         run: |
           BRANCH="${GITHUB_REF#refs/heads/}"
           echo "🔒 Injecting secrets for $BRANCH"
@@ -61,24 +61,17 @@ jobs:
           echo "API_KEY=$API_KEY"
           echo "APP_KEY2=$APP_KEY2"
 
-      - name: Notify Slack
+      - name: Notify Slack (success/failure/cancelled)
         if: always()
         run: |
-          STATUS="${{ job.status }}"
-
-          if [ "$STATUS" = "success" ]; then
-            EMOJI=":white_check_mark:"
-            MESSAGE="Deployment Succeeded"
-          elif [ "$STATUS" = "failure" ]; then
-            EMOJI=":x:"
-            MESSAGE="Deployment Failed"
-          elif [ "$STATUS" = "cancelled" ]; then
-            EMOJI=":warning:"
-            MESSAGE="Deployment Cancelled"
-          fi
+          case "${{ job.status }}" in
+            success) ICON="✅"; ;;
+            failure) ICON="❌"; ;;
+            cancelled) ICON="⚠️"; ;;
+          esac
 
           curl -X POST -H 'Content-type: application/json' \
             --data "{
-              \"text\": \"$EMOJI $MESSAGE on branch ${{ github.ref_name }}\nWorkflow: ${{ github.workflow }}\"
+              \"text\": \"$ICON *Deployment \`${{ job.status }}`* on branch \`${{ github.ref_name }}\`\n*Workflow:* \`${{ github.workflow }}\`\n*Repo:* <https://github.com/${{ github.repository }}|${{ github.repository }}>\"
             }" \
             ${{ secrets.SLACK_WEBHOOK_URL }}
