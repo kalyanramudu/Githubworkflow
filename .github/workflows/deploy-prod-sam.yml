@@ -13,13 +13,13 @@ permissions:
 jobs:
   print-vars:
     runs-on: ubuntu-latest
-    environment: ${{ github.ref_name }}  # 👈 Match branch to environment name
+    environment: ${{ github.ref_name }}  # Automatically maps to Development or Production env
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Load environment variables from branch
+      - name: Load environment variables from branch file
         run: |
           BRANCH="${GITHUB_REF#refs/heads/}"
           FILE=".github/envs/${BRANCH}.env"
@@ -36,7 +36,7 @@ jobs:
           done < "$FILE"
         shell: bash
 
-      - name: Inject secrets into env
+      - name: Inject environment-specific secrets
         run: |
           BRANCH="${GITHUB_REF#refs/heads/}"
           echo "🔒 Injecting secrets for $BRANCH"
@@ -60,3 +60,33 @@ jobs:
           echo "DB_PASSWORD=$DB_PASSWORD"
           echo "API_KEY=$API_KEY"
           echo "APP_KEY2=$APP_KEY2"
+
+      - name: Slack Notification
+        if: always()
+        run: |
+          STATUS="${{ job.status }}"
+
+          if [ "$STATUS" = "success" ]; then
+            COLOR="good"
+            EMOJI="✅"
+            MESSAGE="*Deployment Succeeded*"
+          elif [ "$STATUS" = "failure" ]; then
+            COLOR="danger"
+            EMOJI="❌"
+            MESSAGE="*Deployment Failed*"
+          elif [ "$STATUS" = "cancelled" ]; then
+            COLOR="warning"
+            EMOJI="⚠️"
+            MESSAGE="*Deployment Cancelled*"
+          fi
+
+          curl -X POST -H 'Content-type: application/json' \
+            --data "{
+              \"attachments\": [
+                {
+                  \"color\": \"$COLOR\",
+                  \"text\": \"$EMOJI $MESSAGE on branch \`${{ github.ref_name }}\`\nWorkflow: \`${{ github.workflow }}\`\nRun: <https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Logs>\"
+                }
+              ]
+            }" \
+            ${{ secrets.SLACK_WEBHOOK_URL }}
