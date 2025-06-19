@@ -77,3 +77,11 @@ jobs:
             # --parameter-overrides \
             #   Environment=${{ env.ENV_NAME }} \
             #   ApiStageName=${{ env.ENV_NAME }}
+
+      - name: Notify Slack
+        uses: act10ns/slack@v2
+        if: always()
+        with:
+          webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          status: ${{ job.status }}
+          steps: ${{ toJson(steps) }}
