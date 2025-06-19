@@ -62,16 +62,9 @@ jobs:
           echo "APP_KEY2=$APP_KEY2"
 
       - name: Notify Slack (success/failure/cancelled)
+      - uses: act10ns/slack@v2
+        with:
+          channel: 'githubaction_workflow_alerts'
+          status: ${{ job.status }}
+          steps: ${{ toJson(steps) }}
         if: always()
-        run: |
-          case "${{ job.status }}" in
-            success) ICON="✅"; ;;
-            failure) ICON="❌"; ;;
-            cancelled) ICON="⚠️"; ;;
-          esac
-
-          curl -X POST -H 'Content-type: application/json' \
-            --data "{
-              \"text\": \"$ICON *Deployment \`${{ job.status }}`* on branch \`${{ github.ref_name }}\`\n*Workflow:* \`${{ github.workflow }}\`\n*Repo:* <https://github.com/${{ github.repository }}|${{ github.repository }}>\"
-            }" \
-            ${{ secrets.SLACK_WEBHOOK_URL }}
