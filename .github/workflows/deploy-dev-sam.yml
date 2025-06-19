@@ -71,7 +71,7 @@ jobs:
             --capabilities CAPABILITY_IAM CAPABILITY_AUTO_EXPAND \
             --region ${{ env.AWS_REGION }} \
             --no-confirm-changeset \
-            --no-fail-on-empty-changeset \
-            --parameter-overrides \
-              Environment=${{ env.ENV_NAME }} \
-              ApiStageName=${{ env.ENV_NAME }}
+            --no-fail-on-empty-changeset
+            # --parameter-overrides \
+            #   Environment=${{ env.ENV_NAME }} \
+            #   ApiStageName=${{ env.ENV_NAME }}
