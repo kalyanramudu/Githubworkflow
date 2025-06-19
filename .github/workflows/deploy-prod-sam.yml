@@ -61,10 +61,11 @@ jobs:
           echo "API_KEY=$API_KEY"
           echo "APP_KEY2=$APP_KEY2"
 
-      - name: Notify Slack (success/failure/cancelled)
+      - name: Notify Slack
         uses: act10ns/slack@v2
+        if: always()
         with:
-          channel: 'githubaction_workflow_alerts'
+          webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
           status: ${{ job.status }}
           steps: ${{ toJson(steps) }}
-        if: always()
+
