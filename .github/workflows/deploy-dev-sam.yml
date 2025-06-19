@@ -3,7 +3,7 @@ name: Deploy SAM Lambda from Branch
 on:
   push:
     branches:
-      - Development   # Make sure your branch is named "Development"
+      - Development   # Make sure your branch is exactly named "Development"
 
 permissions:
   id-token: write
@@ -22,15 +22,15 @@ jobs:
         with:
           node-version: '22'
 
-      # - name: Set up Python
-      #   uses: actions/setup-python@v5
-      #   with:
-      #     python-version: '3.11'
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
 
       - name: Install AWS SAM CLI
         run: pip install aws-sam-cli
 
-      - name: Load env file based on branch name
+      - name: Load environment variables from branch
         run: |
           BRANCH=$(echo "${GITHUB_REF#refs/heads/}")
           FILE=".github/envs/${BRANCH}.env"
@@ -73,4 +73,3 @@ jobs:
             --parameter-overrides \
               Environment=${{ env.ENV_NAME }} \
               ApiStageName=${{ env.ENV_NAME }}
-
