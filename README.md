@@ -33,15 +33,25 @@ Matching branch name ⇌ environment name is required for the secrets to resolve
 2. .env File per Branch
 ..................................
  Location:
+
 .github/envs/<branch-name>.env
+
 So for:
+
 Branch Development → .github/envs/Development.env
+
 Branch Production → .github/envs/Production.env
+
 Branch Staging → .github/envs/Staging.env
+
 Each file contains key-value pairs:
+
 APP_NAME=nomo-lambdas-staging
+
 S3_BUCKET=my-staging-bucket
+
 S3_BUCKET_PREFIX=staging-artifacts
+
 ENV_NAME=Staging
 
 # kalyan-lambda-sam-app
