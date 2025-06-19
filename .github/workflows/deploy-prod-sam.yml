@@ -84,9 +84,9 @@ jobs:
             --region ${{ env.AWS_DEFAULT_REGION }} \
             --no-confirm-changeset \
             --no-fail-on-empty-changeset \
-            --parameter-overrides \
-              Environment=${{ env.ENV_NAME }} \
-              ApiStageName=${{ env.ENV_NAME }}
+            # --parameter-overrides \
+            #   Environment=${{ env.ENV_NAME }} \
+            #   ApiStageName=${{ env.ENV_NAME }}
 
       - name: Notify Slack
         uses: act10ns/slack@v2
