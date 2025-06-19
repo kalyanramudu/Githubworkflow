@@ -1,0 +1,76 @@
+name: Deploy SAM Lambda from Branch
+
+on:
+  push:
+    branches:
+      - Development
+      - Production
+      # Add more branches here if needed
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '22'
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install AWS SAM CLI
+        run: pip install aws-sam-cli
+
+      - name: Load environment variables from branch
+        run: |
+          BRANCH=$(echo "${GITHUB_REF#refs/heads/}")
+          FILE=".github/envs/${BRANCH}.env"
+
+          if [ ! -f "$FILE" ]; then
+            echo "❌ Environment file $FILE not found!" && exit 1
+          fi
+
+          echo "✅ Loading environment variables from $FILE"
+          while IFS='=' read -r key value || [ -n "$key" ]; do
+            if [[ "$key" =~ ^[A-Za-z_][A-Za-z0-9_]*$ ]]; then
+              echo "$key=$value" >> $GITHUB_ENV
+            fi
+          done < "$FILE"
+        shell: bash
+
+      - name: Configure AWS Credentials using OIDC
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          role-to-assume: arn:aws:iam::571600831534:role/github-actions-sam-deploy-role
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: SAM Build
+        run: sam build
+
+      - name: SAM Package
+        run: |
+          sam package \
+            --output-template-file packaged.yaml \
+            --s3-bucket ${{ env.S3_BUCKET }} \
+            --s3-prefix ${{ env.APP_NAME }}-artifacts
+
+      - name: SAM Deploy
+        run: |
+          sam deploy \
+            --template-file packaged.yaml \
+            --stack-name ${{ env.APP_NAME }} \
+            --capabilities CAPABILITY_IAM CAPABILITY_AUTO_EXPAND \
+            --region ${{ env.AWS_REGION }} \
+            --no-confirm-changeset \
+            --no-fail-on-empty-changeset
