@@ -1,40 +1,36 @@
-#Key Dependencies
-
-1. Environment Secrets Configuration
-Rule:
-workflow uses:
-```environment: ${{ github.ref_name }}
-
+🔐 Key Dependencies for GitHub Actions Deployment
+✅ 1. Environment Secrets Configuration
+📌 Rule:
+If your workflow uses:
+environment: ${{ github.ref_name }}
 Then GitHub looks for an Environment with the exact same name as the branch (e.g., Production, Development) under Settings → Environments.
-So:
+🔁 So:
 If you create a new branch like Staging, and your workflow runs with:
-```environment: ${{ github.ref_name }}
+environment: ${{ github.ref_name }}
 You must also:
 Go to Settings > Environments in your GitHub repo.
 Create a new environment called Staging.
-Add the necessary secrets to that environment:
-*STAGING_AWS_REGION
-*STAGING_DB_PASSWORD
-*STAGING_API_KEY
-*STAGING_AWS_ARN (or however referencing the role)
+
+✅Add the necessary secrets to that environment:
+
+STAGING_AWS_REGION
+STAGING_DB_PASSWORD
+STAGING_API_KEY
+STAGING_AWS_ARN (or however you're referencing the role)
+
 ✅ Matching branch name ⇌ environment name is required for the secrets to resolve properly via ${{ secrets.* }}.
-
-
 ✅ 2. .env File per Branch
 📁 Location:
 .github/envs/<branch-name>.env
 So for:
-*Branch Development → .github/envs/Development.env
-*Branch Production → .github/envs/Production.env
-*Branch Staging → .github/envs/Staging.env
-
+Branch Development → .github/envs/Development.env
+Branch Production → .github/envs/Production.env
+Branch Staging → .github/envs/Staging.env
 Each file contains key-value pairs:
-
-```APP_NAME=nomo-lambdas-staging
+APP_NAME=nomo-lambdas-staging
 S3_BUCKET=my-staging-bucket
 S3_BUCKET_PREFIX=staging-artifacts
-ENV_NAME=Staging```
-
+ENV_NAME=Staging
 
 # kalyan-lambda-sam-app
 
