@@ -5,7 +5,8 @@ on:
     branches:
       - Development
       - Production
-
+  workflow_dispatch: 
+    
 permissions:
   id-token: write
   contents: read
