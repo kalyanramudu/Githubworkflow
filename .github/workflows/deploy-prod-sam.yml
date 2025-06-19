@@ -1,40 +1,26 @@
-name: Deploy SAM Lambda from Branch
+name: Print Loaded Environment Variables
 
 on:
   push:
     branches:
       - Development
       - Production
-      # Add more branches here if needed
 
 permissions:
   id-token: write
   contents: read
 
 jobs:
-  deploy:
+  print-vars:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '22'
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
-      - name: Install AWS SAM CLI
-        run: pip install aws-sam-cli
-
       - name: Load environment variables from branch
         run: |
-          BRANCH=$(echo "${GITHUB_REF#refs/heads/}")
+          BRANCH="${GITHUB_REF#refs/heads/}"
           FILE=".github/envs/${BRANCH}.env"
 
           if [ ! -f "$FILE" ]; then
@@ -49,28 +35,26 @@ jobs:
           done < "$FILE"
         shell: bash
 
-      - name: Configure AWS Credentials using OIDC
-        uses: aws-actions/configure-aws-credentials@v3
-        with:
-          role-to-assume: arn:aws:iam::571600831534:role/github-actions-sam-deploy-role
-          aws-region: ${{ env.AWS_REGION }}
-
-      - name: SAM Build
-        run: sam build
-
-      - name: SAM Package
+      - name: Inject secrets into env
         run: |
-          sam package \
-            --output-template-file packaged.yaml \
-            --s3-bucket ${{ env.S3_BUCKET }} \
-            --s3-prefix ${{ env.APP_NAME }}-artifacts
+          BRANCH="${GITHUB_REF#refs/heads/}"
+          echo "🔒 Injecting secrets for $BRANCH"
 
-      - name: SAM Deploy
+          if [ "$BRANCH" = "Production" ]; then
+            echo "AWS_REGION=${{ secrets.PROD_AWS_REGION }}" >> $GITHUB_ENV
+            echo "DB_PASSWORD=${{ secrets.PROD_DB_PASSWORD }}" >> $GITHUB_ENV
+            echo "API_KEY=${{ secrets.PROD_API_KEY }}" >> $GITHUB_ENV
+          elif [ "$BRANCH" = "Development" ]; then
+            echo "AWS_REGION=${{ secrets.DEV_AWS_REGION }}" >> $GITHUB_ENV
+            echo "DB_PASSWORD=${{ secrets.DEV_DB_PASSWORD }}" >> $GITHUB_ENV
+            echo "API_KEY=${{ secrets.DEV_API_KEY }}" >> $GITHUB_ENV
+          fi
+
+      - name: Print loaded environment variables
         run: |
-          sam deploy \
-            --template-file packaged.yaml \
-            --stack-name ${{ env.APP_NAME }} \
-            --capabilities CAPABILITY_IAM CAPABILITY_AUTO_EXPAND \
-            --region ${{ env.AWS_REGION }} \
-            --no-confirm-changeset \
-            --no-fail-on-empty-changeset
+          echo "🔍 Loaded Environment Variables:"
+          echo "APP_NAME=$APP_NAME"
+          echo "S3_BUCKET=$S3_BUCKET"
+          echo "AWS_REGION=$AWS_REGION"
+          echo "DB_PASSWORD=$DB_PASSWORD"
+          echo "API_KEY=$API_KEY"
