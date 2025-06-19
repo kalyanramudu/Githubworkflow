@@ -13,7 +13,7 @@ permissions:
 jobs:
   print-vars:
     runs-on: ubuntu-latest
-    environment: ${{ github.ref_name }}  # Automatically maps to Development or Production env
+    environment: ${{ github.ref_name }}
 
     steps:
       - name: Checkout code
@@ -36,7 +36,7 @@ jobs:
           done < "$FILE"
         shell: bash
 
-      - name: Inject environment-specific secrets
+      - name: Inject secrets based on branch
         run: |
           BRANCH="${GITHUB_REF#refs/heads/}"
           echo "🔒 Injecting secrets for $BRANCH"
@@ -61,32 +61,24 @@ jobs:
           echo "API_KEY=$API_KEY"
           echo "APP_KEY2=$APP_KEY2"
 
-      - name: Slack Notification
+      - name: Notify Slack
         if: always()
         run: |
           STATUS="${{ job.status }}"
 
           if [ "$STATUS" = "success" ]; then
-            COLOR="good"
-            EMOJI="✅"
-            MESSAGE="*Deployment Succeeded*"
+            EMOJI=":white_check_mark:"
+            MESSAGE="Deployment Succeeded"
           elif [ "$STATUS" = "failure" ]; then
-            COLOR="danger"
-            EMOJI="❌"
-            MESSAGE="*Deployment Failed*"
+            EMOJI=":x:"
+            MESSAGE="Deployment Failed"
           elif [ "$STATUS" = "cancelled" ]; then
-            COLOR="warning"
-            EMOJI="⚠️"
-            MESSAGE="*Deployment Cancelled*"
+            EMOJI=":warning:"
+            MESSAGE="Deployment Cancelled"
           fi
 
           curl -X POST -H 'Content-type: application/json' \
             --data "{
-              \"attachments\": [
-                {
-                  \"color\": \"$COLOR\",
-                  \"text\": \"$EMOJI $MESSAGE on branch \`${{ github.ref_name }}\`\nWorkflow: \`${{ github.workflow }}\`\nRun: <https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Logs>\"
-                }
-              ]
+              \"text\": \"$EMOJI $MESSAGE on branch ${{ github.ref_name }}\nWorkflow: ${{ github.workflow }}\"
             }" \
             ${{ secrets.SLACK_WEBHOOK_URL }}
