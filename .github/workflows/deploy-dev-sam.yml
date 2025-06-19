@@ -3,7 +3,8 @@ name: Deploy SAM Lambda from Branch
 on:
   push:
     branches:
-      - Development  # 👈 Match this with your actual branch name
+      - Development
+      - Production
 
 permissions:
   id-token: write
@@ -12,6 +13,7 @@ permissions:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment: ${{ github.ref_name }}
 
     steps:
       - name: Checkout code
@@ -28,11 +30,11 @@ jobs:
           python-version: '3.11'
 
       - name: Install AWS SAM CLI
-        run: pip install aws-sam-cli
+        run: pip install aws-sam-cli==1.140.0
 
       - name: Load environment variables from branch
         run: |
-          BRANCH=$(echo "${GITHUB_REF#refs/heads/}")
+          BRANCH="${GITHUB_REF#refs/heads/}"
           FILE=".github/envs/${BRANCH}.env"
 
           if [ ! -f "$FILE" ]; then
@@ -50,7 +52,7 @@ jobs:
       - name: Configure AWS Credentials using OIDC
         uses: aws-actions/configure-aws-credentials@v3
         with:
-          role-to-assume: arn:aws:iam::571600831534:role/github-actions-sam-deploy-role
+          role-to-assume: arn:aws:iam::571600831534:role/github-actions-sam-deploy-role  # 👈 single account
           aws-region: ${{ env.AWS_REGION }}
 
       - name: SAM Build
