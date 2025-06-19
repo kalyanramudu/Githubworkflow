@@ -1,10 +1,10 @@
-name: Deploy SAM Lambda (Branch-based)
+name: Deploy SAM Lambda from Branch
 
 on:
   push:
     branches:
-      - Development
-      - Production
+      - Development   # Make sure your branch is named "Development"
+
 permissions:
   id-token: write
   contents: read
@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Code
+      - name: Checkout code
         uses: actions/checkout@v3
 
       - name: Set up Node.js
@@ -22,18 +22,18 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
+      # - name: Set up Python
+      #   uses: actions/setup-python@v5
+      #   with:
+      #     python-version: '3.11'
 
       - name: Install AWS SAM CLI
         run: pip install aws-sam-cli
 
-      - name: Determine branch and load env file
+      - name: Load env file based on branch name
         run: |
           BRANCH=$(echo "${GITHUB_REF#refs/heads/}")
-          FILE="envs/${BRANCH}.env"
+          FILE=".github/envs/${BRANCH}.env"
 
           if [ ! -f "$FILE" ]; then
             echo "❌ Environment file $FILE not found!" && exit 1
@@ -41,7 +41,7 @@ jobs:
 
           echo "✅ Loading environment variables from $FILE"
           set -o allexport
-          source $FILE
+          source "$FILE"
           set +o allexport
         shell: bash
 
