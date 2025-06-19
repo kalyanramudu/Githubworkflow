@@ -1,5 +1,5 @@
 Key Dependencies for GitHub Actions Deployment
-.....................................................
+
 1. Environment Secrets Configuration
 Rule:
 ......
