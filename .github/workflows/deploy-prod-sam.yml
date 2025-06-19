@@ -33,7 +33,7 @@ jobs:
           FILE=".github/envs/${BRANCH}.env"
 
           if [ ! -f "$FILE" ]; then
-            echo "❌ Environment file $FILE not found!" && exit 1
+            echo "❌  Environment file $FILE not found!" && exit 1
           fi
 
           echo "✅ Loading environment variables from $FILE"
