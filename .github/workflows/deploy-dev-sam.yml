@@ -1,4 +1,4 @@
-name: Deploy SAM Lambda from Branch
+name: Deploy SAM Application from Branch
 
 on:
   push:
@@ -19,17 +19,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '22'
-
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      - name: Install AWS SAM CLI
+      - name: Install AWS SAM CLI v1.140.0
         run: pip install aws-sam-cli==1.140.0
 
       - name: Load environment variables from branch
@@ -49,10 +44,25 @@ jobs:
           done < "$FILE"
         shell: bash
 
+      - name: Inject secrets into env
+        run: |
+          BRANCH="${GITHUB_REF#refs/heads/}"
+          echo "🔒 Injecting secrets for $BRANCH"
+
+          if [ "$BRANCH" = "Production" ]; then
+            echo "AWS_REGION=${{ secrets.PROD_AWS_REGION }}" >> $GITHUB_ENV
+            echo "DB_PASSWORD=${{ secrets.PROD_DB_PASSWORD }}" >> $GITHUB_ENV
+            echo "API_KEY=${{ secrets.PROD_API_KEY }}" >> $GITHUB_ENV
+          elif [ "$BRANCH" = "Development" ]; then
+            echo "AWS_REGION=${{ secrets.DEV_AWS_REGION }}" >> $GITHUB_ENV
+            echo "DB_PASSWORD=${{ secrets.DEV_DB_PASSWORD }}" >> $GITHUB_ENV
+            echo "API_KEY=${{ secrets.DEV_API_KEY }}" >> $GITHUB_ENV
+          fi
+
       - name: Configure AWS Credentials using OIDC
         uses: aws-actions/configure-aws-credentials@v3
         with:
-          role-to-assume: arn:aws:iam::571600831534:role/github-actions-sam-deploy-role  # 👈 single account
+          role-to-assume: arn:aws:iam::571600831534:role/github-actions-sam-deploy-role  # 👈 static role
           aws-region: ${{ env.AWS_REGION }}
 
       - name: SAM Build
@@ -63,7 +73,7 @@ jobs:
           sam package \
             --output-template-file packaged.yaml \
             --s3-bucket ${{ env.S3_BUCKET }} \
-            --s3-prefix ${{ env.APP_NAME }}-artifacts
+            --s3-prefix ${{ env.S3_BUCKET_PREFIX }}
 
       - name: SAM Deploy
         run: |
