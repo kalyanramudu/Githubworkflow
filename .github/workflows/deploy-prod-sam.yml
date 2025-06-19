@@ -62,7 +62,7 @@ jobs:
           echo "APP_KEY2=$APP_KEY2"
 
       - name: Notify Slack (success/failure/cancelled)
-      - uses: act10ns/slack@v2
+        uses: act10ns/slack@v2
         with:
           channel: 'githubaction_workflow_alerts'
           status: ${{ job.status }}
