@@ -5,17 +5,27 @@ Rule:
 ......
 If your workflow uses:
 environment: ${{ github.ref_name }}
+
 Then GitHub looks for an Environment with the exact same name as the branch (e.g., Production, Development) under Settings → Environments.
+
 So:
+
 If you create a new branch like Staging, and your workflow runs with:
+
 environment: ${{ github.ref_name }}
+
 You must also:
+
 Go to Settings > Environments in your GitHub repo.
+
 Create a new environment called Staging.
+
 Add the necessary secrets to that environment:
+
 STAGING_AWS_REGION
 STAGING_DB_PASSWORD
 STAGING_API_KEY
+
 STAGING_AWS_ARN (or however you're referencing the role)
 
 Matching branch name ⇌ environment name is required for the secrets to resolve properly via ${{ secrets.* }}.
