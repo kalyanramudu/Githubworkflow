@@ -31,7 +31,8 @@ STAGING_AWS_ARN (or however you're referencing the role)
 
 Matching branch name ⇌ environment name is required for the secrets to resolve properly via ${{ secrets.* }}.
 
-✅ .env File per Branch
+✅Branch-specific environment variables must be stored in:
+
 
  Location:
 
