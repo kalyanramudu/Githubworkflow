@@ -1,9 +1,10 @@
-Key Dependencies for GitHub Actions Deployment
+✅Key Dependencies for GitHub Actions Deployment
 
 1. Environment Secrets Configuration
 Rule:
-......
+
 If your workflow uses:
+
 environment: ${{ github.ref_name }}
 
 Then GitHub looks for an Environment with the exact same name as the branch (e.g., Production, Development) under Settings → Environments.
@@ -30,8 +31,8 @@ STAGING_AWS_ARN (or however you're referencing the role)
 
 Matching branch name ⇌ environment name is required for the secrets to resolve properly via ${{ secrets.* }}.
 
-2. .env File per Branch
-..................................
+✅ .env File per Branch
+
  Location:
 
 .github/envs/<branch-name>.env
