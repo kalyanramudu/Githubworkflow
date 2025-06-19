@@ -3,7 +3,7 @@ name: Deploy SAM Lambda from Branch
 on:
   push:
     branches:
-      - Development   # Make sure your branch is exactly named "Development"
+      - Development  # 👈 Match this with your actual branch name
 
 permissions:
   id-token: write
@@ -40,9 +40,11 @@ jobs:
           fi
 
           echo "✅ Loading environment variables from $FILE"
-          set -o allexport
-          source "$FILE"
-          set +o allexport
+          while IFS='=' read -r key value || [ -n "$key" ]; do
+            if [[ "$key" =~ ^[A-Za-z_][A-Za-z0-9_]*$ ]]; then
+              echo "$key=$value" >> $GITHUB_ENV
+            fi
+          done < "$FILE"
         shell: bash
 
       - name: Configure AWS Credentials using OIDC
