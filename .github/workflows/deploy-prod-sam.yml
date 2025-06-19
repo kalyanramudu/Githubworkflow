@@ -13,6 +13,7 @@ permissions:
 jobs:
   print-vars:
     runs-on: ubuntu-latest
+    environment: ${{ github.ref_name }}  # 👈 Match branch to environment name
 
     steps:
       - name: Checkout code
