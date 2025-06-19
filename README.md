@@ -3,7 +3,7 @@
 1. Environment Secrets Configuration
 Rule:
 
-If your workflow uses:
+If your workflow uses: under run-on 
 
 environment: ${{ github.ref_name }}
 
