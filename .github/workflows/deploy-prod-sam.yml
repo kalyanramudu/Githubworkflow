@@ -59,3 +59,4 @@ jobs:
           echo "AWS_REGION=$AWS_REGION"
           echo "DB_PASSWORD=$DB_PASSWORD"
           echo "API_KEY=$API_KEY"
+          echo "APP_KEY2=$APP_KEY2"
