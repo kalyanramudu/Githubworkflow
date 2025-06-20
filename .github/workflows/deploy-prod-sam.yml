@@ -14,7 +14,7 @@ permissions:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: ${{ github.ref_name }}
+    environment: ${{ github.ref_name }}  # Must match environment names: Development, Production
 
     steps:
       - name: Checkout code
@@ -32,9 +32,11 @@ jobs:
         run: |
           BRANCH="${GITHUB_REF#refs/heads/}"
           FILE=".github/envs/${BRANCH}.env"
+
           if [ ! -f "$FILE" ]; then
-            echo "❌  Environment file $FILE not found!" && exit 1
+            echo "❌ Environment file $FILE not found!" && exit 1
           fi
+
           echo "✅ Loading environment variables from $FILE"
           while IFS='=' read -r key value || [ -n "$key" ]; do
             if [[ "$key" =~ ^[A-Za-z_][A-Za-z0-9_]*$ ]]; then
@@ -47,6 +49,7 @@ jobs:
         run: |
           BRANCH="${GITHUB_REF#refs/heads/}"
           echo "🔒 Injecting secrets for $BRANCH"
+
           if [ "$BRANCH" = "Production" ]; then
             echo "AWS_DEFAULT_REGION=${{ secrets.PROD_AWS_REGION }}" >> $GITHUB_ENV
             echo "DB_PASSWORD=${{ secrets.PROD_DB_PASSWORD }}" >> $GITHUB_ENV
@@ -56,7 +59,6 @@ jobs:
             echo "AWS_DEFAULT_REGION=${{ secrets.DEV_AWS_REGION }}" >> $GITHUB_ENV
             echo "DB_PASSWORD=${{ secrets.DEV_DB_PASSWORD }}" >> $GITHUB_ENV
             echo "API_KEY=${{ secrets.DEV_API_KEY }}" >> $GITHUB_ENV
-            echo "PROD_AWS_ARN=${{ secrets.DEV_AWS_ARN }}" >> $GITHUB_ENV
           fi
 
       - name: Configure AWS Credentials using OIDC
@@ -100,24 +102,36 @@ jobs:
                       "type": "section",
                       "text": {
                         "type": "mrkdwn",
-                        "text": "*✅ GitHub Workflow Notification*"
+                        "text": "*Deployment Notification* :rocket:"
                       }
+                    },
+                    {
+                      "type": "section",
+                      "fields": [
+                        {
+                          "type": "mrkdwn",
+                          "text": "*Workflow:*\n${{ github.workflow }}"
+                        },
+                        {
+                          "type": "mrkdwn",
+                          "text": "*Status:*\n${{ job.status }}"
+                        },
+                        {
+                          "type": "mrkdwn",
+                          "text": "*Branch:*\n${{ github.ref_name }}"
+                        },
+                        {
+                          "type": "mrkdwn",
+                          "text": "*Actor:*\n${{ github.actor }}"
+                        }
+                      ]
                     },
                     {
                       "type": "section",
                       "text": {
                         "type": "mrkdwn",
-                        "text": "*Workflow:* `${{ github.workflow }}`\n*Branch:* `${{ github.ref_name }}`\n*Status:* `${{ job.status }}`\n*Commit:* <https://github.com/${{ github.repository }}/commit/${{ github.sha }}|${{ github.sha }}>"
+                        "text": "<https://github.com/${{ github.repository }}/commit/${{ github.sha }}|View Commit>"
                       }
-                    },
-                    {
-                      "type": "context",
-                      "elements": [
-                        {
-                          "type": "mrkdwn",
-                          "text": "🚀 Triggered by: `${{ github.actor }}`"
-                        }
-                      ]
                     }
                   ]
                 }
