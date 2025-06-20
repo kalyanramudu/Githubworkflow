@@ -1,4 +1,4 @@
-name: Deploy SAM Application from Branch production
+name: Deploy SAM Application from Branch
 
 on:
   push:
@@ -14,7 +14,7 @@ permissions:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: ${{ github.ref_name }}  # Match branch with Environment
+    environment: ${{ github.ref_name }}
 
     steps:
       - name: Checkout code
@@ -32,11 +32,9 @@ jobs:
         run: |
           BRANCH="${GITHUB_REF#refs/heads/}"
           FILE=".github/envs/${BRANCH}.env"
-
           if [ ! -f "$FILE" ]; then
             echo "❌  Environment file $FILE not found!" && exit 1
           fi
-
           echo "✅ Loading environment variables from $FILE"
           while IFS='=' read -r key value || [ -n "$key" ]; do
             if [[ "$key" =~ ^[A-Za-z_][A-Za-z0-9_]*$ ]]; then
@@ -49,7 +47,6 @@ jobs:
         run: |
           BRANCH="${GITHUB_REF#refs/heads/}"
           echo "🔒 Injecting secrets for $BRANCH"
-
           if [ "$BRANCH" = "Production" ]; then
             echo "AWS_DEFAULT_REGION=${{ secrets.PROD_AWS_REGION }}" >> $GITHUB_ENV
             echo "DB_PASSWORD=${{ secrets.PROD_DB_PASSWORD }}" >> $GITHUB_ENV
@@ -59,6 +56,7 @@ jobs:
             echo "AWS_DEFAULT_REGION=${{ secrets.DEV_AWS_REGION }}" >> $GITHUB_ENV
             echo "DB_PASSWORD=${{ secrets.DEV_DB_PASSWORD }}" >> $GITHUB_ENV
             echo "API_KEY=${{ secrets.DEV_API_KEY }}" >> $GITHUB_ENV
+            echo "PROD_AWS_ARN=${{ secrets.DEV_AWS_ARN }}" >> $GITHUB_ENV
           fi
 
       - name: Configure AWS Credentials using OIDC
@@ -93,6 +91,7 @@ jobs:
         with:
           payload: |
             {
+              "text": "GitHub Deployment Notification",
               "attachments": [
                 {
                   "color": "${{ job.status == 'success' && '#2eb886' || '#e01e5a' }}",
@@ -101,7 +100,7 @@ jobs:
                       "type": "section",
                       "text": {
                         "type": "mrkdwn",
-                        "text": "*GitHub Workflow Notification*"
+                        "text": "*✅ GitHub Workflow Notification*"
                       }
                     },
                     {
@@ -116,7 +115,7 @@ jobs:
                       "elements": [
                         {
                           "type": "mrkdwn",
-                          "text": "Triggered by: ${{ github.actor }}"
+                          "text": "🚀 Triggered by: `${{ github.actor }}`"
                         }
                       ]
                     }
