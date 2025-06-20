@@ -93,6 +93,7 @@ jobs:
         with:
           payload: |
             {
+              "text": "GitHub Deployment Notification",
               "attachments": [
                 {
                   "fallback": "GitHub Workflow `${{ github.workflow }}` completed with status `${{ job.status }}`.",
