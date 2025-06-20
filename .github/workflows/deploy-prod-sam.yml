@@ -1,12 +1,12 @@
 name: Deploy SAM Application from Branch production
 
 on:
-  # push:
-  #   branches:
-  #     - Development
-  #     - Production
-  workflow_dispatch: 
-    
+  push:
+    branches:
+      - Development
+      - Production
+  workflow_dispatch:
+
 permissions:
   id-token: write
   contents: read
@@ -14,7 +14,7 @@ permissions:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: ${{ github.ref_name }}  # Ensure environments are named 'Development' and 'Production'
+    environment: ${{ github.ref_name }}  # Match branch with Environment
 
     steps:
       - name: Checkout code
@@ -85,15 +85,44 @@ jobs:
             --capabilities CAPABILITY_IAM CAPABILITY_AUTO_EXPAND \
             --region ${{ env.AWS_DEFAULT_REGION }} \
             --no-confirm-changeset \
-            --no-fail-on-empty-changeset \
-            # --parameter-overrides
-            #   Environment=${{ env.ENV_NAME }} \
-            #   ApiStageName=${{ env.ENV_NAME }}
+            --no-fail-on-empty-changeset
 
-      - name: Notify Slack
-        uses: act10ns/slack@v2
+      - name: Notify Slack with Rich Message
         if: always()
+        uses: slackapi/slack-github-action@v1.24.0
         with:
-          webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
-          status: ${{ job.status }}
-          steps: ${{ toJson(steps) }}
+          payload: |
+            {
+              "attachments": [
+                {
+                  "color": "${{ job.status == 'success' && '#2eb886' || '#e01e5a' }}",
+                  "blocks": [
+                    {
+                      "type": "section",
+                      "text": {
+                        "type": "mrkdwn",
+                        "text": "*GitHub Workflow Notification*"
+                      }
+                    },
+                    {
+                      "type": "section",
+                      "text": {
+                        "type": "mrkdwn",
+                        "text": "*Workflow:* `${{ github.workflow }}`\n*Branch:* `${{ github.ref_name }}`\n*Status:* `${{ job.status }}`\n*Commit:* <https://github.com/${{ github.repository }}/commit/${{ github.sha }}|${{ github.sha }}>"
+                      }
+                    },
+                    {
+                      "type": "context",
+                      "elements": [
+                        {
+                          "type": "mrkdwn",
+                          "text": "Triggered by: ${{ github.actor }}"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
