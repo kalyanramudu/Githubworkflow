@@ -34,7 +34,7 @@ jobs:
           FILE=".github/envs/${BRANCH}.env"
 
           if [ ! -f "$FILE" ]; then
-            echo "❌ Environment file $FILE not found!" && exit 1
+            echo "❌  Environment file $FILE not found!" && exit 1
           fi
 
           echo "✅ Loading environment variables from $FILE"
@@ -95,6 +95,7 @@ jobs:
             {
               "attachments": [
                 {
+                  "fallback": "GitHub Workflow `${{ github.workflow }}` completed with status `${{ job.status }}`.",
                   "color": "${{ job.status == 'success' && '#2eb886' || '#e01e5a' }}",
                   "text": "*GitHub Workflow:* `${{ github.workflow }}`\n*Status:* `${{ job.status }}`\n*Branch:* `${{ github.ref_name }}`\n*Actor:* `${{ github.actor }}`\n*Commit:* <https://github.com/${{ github.repository }}/commit/${{ github.sha }}|${{ github.sha }}"
                 }
