@@ -1,0 +1,11 @@
+notify:
+  attachments:
+    - fallback: "GitHub Workflow `${{ github.workflow }}` completed with status `${{ job.status }}`."
+      color: "${{ job.status == 'success' && '#2eb886' || job.status == 'failure' && '#e01e5a' || '#daa038' }}"
+      text: |
+        *GitHub Workflow:* `${{ github.workflow }}`
+        *Job:* `${{ github.job }}`
+        *Status:* `${{ job.status }}`
+        *Branch:* `${{ github.ref_name }}`
+        *Commit:* <https://github.com/${{ github.repository }}/commit/${{ github.sha }}|`${{ github.sha }}`>
+        *Repo:* <https://github.com/${{ github.repository }}|`${{ github.repository }}`>
