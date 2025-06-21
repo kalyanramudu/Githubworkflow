@@ -1,4 +1,5 @@
-name: Deploy SAM Application from Branch for notification
+name: Deploy SAM Application from Branch
+
 on:
   push:
 
@@ -12,7 +13,7 @@ jobs:
 
       # Add your build/deploy steps here
       - name: Example step
-        run: echo "Deploying application......"
+        run: echo "Deploying application..."
 
       # Notify Slack
       - name: Notify Slack
@@ -26,4 +27,7 @@ jobs:
                 {
                   "fallback": "GitHub Workflow `${{ github.workflow }}` completed with status `${{ job.status }}`.",
                   "color": "${{ job.status == 'success' && '#2eb886' || job.status == 'failure' && '#e01e5a' || '#daa038' }}",
-                  "text": "*GitHub Workflow:* `${{ github.workflow }}`\n*Job:* `${{ github.job }}`\n*Status:* `${{ job.status }}`\n*Branch:* `${{ github.ref_name }}`\n*Commit:* <https://github.com/${{ g_
+                  "text": "*GitHub Workflow:* `${{ github.workflow }}`\n*Job:* `${{ github.job }}`\n*Status:* `${{ job.status }}`\n*Branch:* `${{ github.ref_name }}`\n*Commit:* <https://github.com/${{ github.repository }}/commit/${{ github.sha }}|`${{ github.sha }}`>\n*Repo:* <https://github.com/${{ github.repository }}|`${{ github.repository }}`>"
+                }
+              ]
+            }
