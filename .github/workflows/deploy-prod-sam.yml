@@ -1,10 +1,10 @@
 name: Deploy SAM Application from Branch
 
 on:
-  push:
-    branches:
-      - Development
-      - Production
+  # push:
+  #   branches:
+  #     - Development
+  #     - Production
   workflow_dispatch:
 
 permissions:
