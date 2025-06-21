@@ -1,0 +1,29 @@
+name: Deploy SAM Application from Branch for notification
+on:
+  push:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Add your build/deploy steps here
+      - name: Example step
+        run: echo "Deploying application..."
+
+      # Notify Slack
+      - name: Notify Slack
+        uses: act10ns/slack@v2
+        if: always()
+        with:
+          webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          payload: |
+            {
+              "attachments": [
+                {
+                  "fallback": "GitHub Workflow `${{ github.workflow }}` completed with status `${{ job.status }}`.",
+                  "color": "${{ job.status == 'success' && '#2eb886' || job.status == 'failure' && '#e01e5a' || '#daa038' }}",
+                  "text": "*GitHub Workflow:* `${{ github.workflow }}`\n*Job:* `${{ github.job }}`\n*Status:* `${{ job.status }}`\n*Branch:* `${{ github.ref_name }}`\n*Commit:* <https://github.com/${{ g_
