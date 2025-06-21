@@ -12,7 +12,7 @@ jobs:
 
       # Add your build/deploy steps here
       - name: Example step
-        run: echo "Deploying application..."
+        run: echo "Deploying application......"
 
       # Notify Slack
       - name: Notify Slack
