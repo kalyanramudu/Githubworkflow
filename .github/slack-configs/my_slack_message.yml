@@ -2,8 +2,8 @@ notify:
   attachments:
     - fallback: "GitHub Workflow `${{ github.workflow }}` completed with status `${{ job.status }}`."
       color: >-
-        ${{ job.status == 'success' && '#2eb886' || 
-            job.status == 'failure' && '#e01e5a' || 
+        ${{ job.status == 'success' && '#2eb886' ||
+            job.status == 'failure' && '#e01e5a' ||
             job.status == 'cancelled' && '#daa038' }}
       text: |
         *Workflow:* `${{ github.workflow }}`
