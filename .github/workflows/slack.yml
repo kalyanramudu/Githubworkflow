@@ -21,13 +21,5 @@ jobs:
         if: always()
         with:
           webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
-          payload: |
-            {
-              "attachments": [
-                {
-                  "fallback": "GitHub Workflow `${{ github.workflow }}` completed with status `${{ job.status }}`.",
-                  "color": "${{ job.status == 'success' && '#2eb886' || job.status == 'failure' && '#e01e5a' || '#daa038' }}",
-                  "text": "*GitHub Workflow:* `${{ github.workflow }}`\n*Job:* `${{ github.job }}`\n*Status:* `${{ job.status }}`\n*Branch:* `${{ github.ref_name }}`\n*Commit:* <https://github.com/${{ github.repository }}/commit/${{ github.sha }}|`${{ github.sha }}`>\n*Repo:* <https://github.com/${{ github.repository }}|`${{ github.repository }}`>"
-                }
-              ]
-            }
+          status: ${{ job.status }}
+          config: .github/slack-configs/my_slack_message.yml
