@@ -1,0 +1,39 @@
+name: Slack Notification
+
+on: [push]
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Get short SHA
+        run: echo "SHORT_SHA=${GITHUB_SHA::7}" >> $GITHUB_ENV
+
+      - name: Calculate build duration
+        id: calculate_duration
+        run: |
+          start_time=$(date +%s)
+          sleep 1  # Simulate work
+          end_time=$(date +%s)
+          duration=$((end_time - start_time))
+          echo "duration=$duration" >> $GITHUB_ENV
+          echo "::set-output name=duration::$duration"
+
+      - name: Load Slack payload
+        id: load_payload
+        run: |
+          echo "json<<EOF" >> $GITHUB_OUTPUT
+          cat .github/slack-configs/mail.json >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Send Slack Notification
+        uses: slackapi/slack-github-action@v1.26.0
+        with:
+          payload: ${{ steps.load_payload.outputs.json }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
