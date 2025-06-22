@@ -18,7 +18,7 @@ jobs:
           echo "SHORT_SHA=${GITHUB_SHA::7}" >> $GITHUB_ENV
 
       - name: Deploy application
-        run: echo "🚀 Deploying application..…"
+        run: echo "🚀 Deploying application.....…"
 
       - name: Calculate build duration
         run: |
