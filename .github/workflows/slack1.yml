@@ -1,7 +1,7 @@
 name: Deploy SAM Application from Branch
 
 on:
-  push:
+  #push:
   workflow_dispatch:
   
 
