@@ -53,7 +53,7 @@ jobs:
       - name: Inject secrets into env
         run: |
           BRANCH="${GITHUB_REF#refs/heads/}"
-          echo "🔒 Injecting secrets for $BRANCH"
+          echo "🔒  Injecting secrets for $BRANCH"
 
           if [ "$BRANCH" = "Production" ]; then
             echo "AWS_DEFAULT_REGION=${{ secrets.PROD_AWS_REGION }}" >> $GITHUB_ENV
