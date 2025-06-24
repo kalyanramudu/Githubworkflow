@@ -21,6 +21,7 @@ jobs:
         uses: actions/checkout@v3
         
       - name: Set up meta‐vars
+        if: always()
         run: |
           echo "BUILD_START=$(date +%s)" >> $GITHUB_ENV
           echo "SHORT_SHA=${GITHUB_SHA::7}" >> $GITHUB_ENV
@@ -93,6 +94,7 @@ jobs:
             --no-fail-on-empty-changeset
 
       - name: Calculate build duration
+        if: always()
         run: |
           END=$(date +%s)
           echo "DURATION=$((END - BUILD_START))" >> $GITHUB_ENV
