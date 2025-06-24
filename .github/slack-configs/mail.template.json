@@ -1,4 +1,3 @@
-
 {
   "attachments": [
     {
@@ -17,6 +16,10 @@
             {
               "type": "mrkdwn",
               "text": "*Repo*\n<https://github.com/${GITHUB_REPOSITORY}|${GITHUB_REPOSITORY}>"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Branch*\n${GITHUB_REF_NAME}"
             },
             {
               "type": "mrkdwn",
