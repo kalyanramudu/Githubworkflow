@@ -113,6 +113,7 @@ jobs:
           envsubst < .github/slack-configs/mail.template.json > slack_payload.json
 
       - name: Send Slack notification
+        if: always()
         uses: slackapi/slack-github-action@v1.26.0
         with:
           payload-file-path: slack_payload.json
