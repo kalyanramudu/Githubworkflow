@@ -108,6 +108,7 @@ jobs:
           export GITHUB_EVENT_NAME="${{ github.event_name }}"
           export RUN_LOG_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           export COMMIT_MESSAGE="${{ github.event.head_commit.message }}"
+          echo "GITHUB_REF_NAME=${GITHUB_REF##*/}" >> $GITHUB_ENV
           # Populate template:
           envsubst < .github/slack-configs/mail.template.json > slack_payload.json
 
