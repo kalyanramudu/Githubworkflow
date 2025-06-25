@@ -15,19 +15,17 @@ jobs:
     outputs:
       build_start: ${{ steps.meta.outputs.build_start }}
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
       - name: Set up meta-vars
         id: meta
         run: |
           echo "build_start=$(date +%s)" >> $GITHUB_OUTPUT
           echo "SHORT_SHA=${GITHUB_SHA::7}" >> $GITHUB_ENV
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
+      - name: Checkout code
+        uses: actions/checkout@v3
+      # - name: Set up Python
+      #   uses: actions/setup-python@v5
+      #   with:
+      #     python-version: '3.11'
 
       - name: Install AWS SAM CLI v1.140.0
         run: pip install aws-sam-cli==1.140.0
