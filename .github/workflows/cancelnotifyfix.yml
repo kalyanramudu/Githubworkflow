@@ -30,7 +30,11 @@ jobs:
     if: always()
     needs: deploy
     runs-on: ubuntu-latest
+    environment: ${{ github.ref_name }}
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        
       - name: Generate Slack payload
         run: |
           export STATUS="${{ needs.deploy.result == 'success' && '✅ Succeeded' || needs.deploy.result == 'failure' && '❌ Failed' || '⚠️ Cancelled' }}"
