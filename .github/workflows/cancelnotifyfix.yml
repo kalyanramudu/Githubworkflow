@@ -24,7 +24,7 @@ jobs:
           echo "build_start=$(date +%s)" >> $GITHUB_OUTPUT
           echo "SHORT_SHA=${GITHUB_SHA::7}" >> $GITHUB_ENV
 
-      # other deployment steps go here.....
+      # other deployment steps go here.......
 
   notify:
     if: always()
