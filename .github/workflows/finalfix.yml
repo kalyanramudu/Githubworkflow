@@ -66,6 +66,7 @@ jobs:
             echo "AWS_DEFAULT_REGION=${{ secrets.DEV_AWS_REGION }}" >> $GITHUB_ENV
             echo "DB_PASSWORD=${{ secrets.DEV_DB_PASSWORD }}" >> $GITHUB_ENV
             echo "API_KEY=${{ secrets.DEV_API_KEY }}" >> $GITHUB_ENV
+            echo "PROD_AWS_ARN=${{ secrets.DEV_AWS_ARN }}" >> $GITHUB_ENV
           fi
 
       - name: Configure AWS Credentials using OIDC
