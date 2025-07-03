@@ -1,7 +1,7 @@
 name: Deploy SAM Application from Branch along with custom notification
 
 on:
-  #push:
+  push:
   #   branches:
   #     - Development
   #     - Production
@@ -19,6 +19,7 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+        if: always()
         
       - name: Set up meta‐vars
         if: always()
